@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      imagePullSecrets:
+        - name: dockercredential
+      containers:
+        - name: server
+          image: solsticetech/platform-dev:serv5
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_PORT
+              value: '4000'
+            - name: DB_USERNAME
+              value: solstice
+            - name: DB_HOST
+              value: postgres-cluster-ip-service
+            - name: DB_DATABASE
+              value: solstice
+            - name: NODE_ENV
+              value: production
+            - name: DB_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: dbpassword
+                  key: PGPASSWORD
+            - name: SECRET_KEY
+              valueFrom: 
+                secretKeyRef:
+                  name: secretkey
+                  key: SECRET_KEY
+            - name: URJANET_API_USERNAME
+              valueFrom: 
+                secretKeyRef:
+                  name: urjannetapiusr
+                  key: URJANET_API_USERNAME
+            - name: URJANET_API_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: urjanetapipswd
+                  key: URJANET_API_PASSWORD
+            - name: SPREEDLY_KEY
+              valueFrom: 
+                secretKeyRef:
+                  name: spreedlykey
+                  key: SPREEDLY_KEY
+            - name: SPREEDLY_SECRET
+              valueFrom: 
+                secretKeyRef:
+                  name: spreedlysecret
+                  key: SPREEDLY_SECRET
+            - name: AWS_ACCESS_KEY
+              valueFrom: 
+                secretKeyRef:
+                  name: awsaccesskey
+                  key: AWS_ACCESS_KEY
+            - name: AWS_SECRET_KEY
+              valueFrom: 
+                secretKeyRef:
+                  name: awssecretkey
+                  key: AWS_SECRET_KEY

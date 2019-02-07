@@ -1,0 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+data:
+  client-body-buffer-size: 32M
+  hsts: "true"
+  proxy-body-size: 1G
+  proxy-buffering: "off"
+  proxy-read-timeout: "600"
+  proxy-send-timeout: "600"
+  server-tokens: "false"
+  upstream-keepalive-connections: "50"
+  use-proxy-protocol: "false"
+
+  # Work around for HTTP->HTTPS redirect not working when using the PROXY protocol:
+  # https://github.com/kubernetes/ingress-nginx/issues/2724
+  # It works by getting Nginx to listen on port 8080 on top of the standard 80 and 443,
+  # and making any requests sent to port 8080 be reponded do by this code, rather than
+  # the normal port 80 handling.
+  ssl-redirect: "false"
+  http-snippet: |
+    map true $pass_access_scheme {
+      default "https";}
+    map true $pass_port {
+      default 443;}
+---
